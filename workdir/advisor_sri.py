@@ -118,7 +118,7 @@ def create_financial_advisor_workbook():
     dashboard.write('B15', '=COUNTA(Goals!A3:A12)', cell_format)
     dashboard.write('C15', '→ View Goals', nav_format)
     dashboard.write('A16', 'Total Goal Amount', cell_format)
-    dashboard.write('B16', '=SUM(Goals!D3:D12)', currency_format)
+    dashboard.write('B16', '=SUM(Goals!G3:G12)', currency_format)
     
     # Quick Ratios
     dashboard.write('A18', 'FINANCIAL RATIOS', header_format)
@@ -285,21 +285,26 @@ def create_financial_advisor_workbook():
 
     # 6. GOALS SHEET
     goals = workbook.add_worksheet('Goals')
-    goals.set_column('A:A', 20)
-    goals.set_column('B:B', 12)
-    goals.set_column('C:C', 12)
-    goals.set_column('D:D', 15)
-    goals.set_column('E:E', 12)
-    goals.set_column('F:F', 15)
-    goals.set_column('G:G', 15)
-    goals.set_column('H:H', 15)
+    goals.set_column('A:A', 15)  # Mandatory/Optional
+    goals.set_column('B:B', 8)   # S.No
+    goals.set_column('C:C', 20)  # Goal Name
+    goals.set_column('D:D', 12)  # Time to Achieve
+    goals.set_column('E:E', 15)  # Today's Value
+    goals.set_column('F:F', 12)  # Inflation %
+    goals.set_column('G:G', 15)  # Future Value
+    goals.set_column('H:H', 15)  # Offset
+    goals.set_column('I:I', 15)  # Deficit
+    goals.set_column('J:J', 18)  # Expected Rate of Return %
+    goals.set_column('K:K', 20)  # Monthly Investment Required
+    goals.set_column('L:L', 20)  # Actual Investment being started
     
     goals.write('A1', 'FINANCIAL GOALS PLANNER', header_format)
-    goals.merge_range('A1:H1', 'FINANCIAL GOALS PLANNER', header_format)
+    goals.merge_range('A1:L1', 'FINANCIAL GOALS PLANNER', header_format)
     
     # Headers
-    headers = ['Goal Name', 'Years to Goal', 'Inflation %', 'Future Value Needed (₹)', 
-               'Current Savings (₹)', 'Monthly SIP Required (₹)', 'Expected Return %', 'Status']
+    headers = ['Mandatory / Optional', 'S.No', 'Goal Name', 'Time to Achieve (in Years)', 
+               'Today\'s Value', 'Inflation %', 'Future Value', 'Offset', 'Deficit',
+               'Expected Rate of Return %', 'Monthly Investment Required', 'Actual Investment being started']
     
     for i, header in enumerate(headers):
         goals.write(1, i, header, header_format)
@@ -311,18 +316,23 @@ def create_financial_advisor_workbook():
         'Health Insurance', 'Other Goal'
     ]
     
-    for i, goal in enumerate(sample_goals, 2):
-        goals.write(f'A{i+1}', goal, cell_format)
-        goals.write(f'B{i+1}', 10, cell_format)  # Default 10 years
-        goals.write(f'C{i+1}', 0.06, percentage_format)  # 6% inflation
-        goals.write(f'D{i+1}', 1000000, currency_format)  # 10 lakh default
-        goals.write(f'E{i+1}', 0, currency_format)  # Current savings
-        
-        # Monthly SIP calculation: PMT formula
-        # =PMT(G3/12, B3*12, -E3, D3)
-        goals.write(f'F{i+1}', f'=PMT(G{i+1}/12,B{i+1}*12,-E{i+1},D{i+1})', currency_format)
-        goals.write(f'G{i+1}', 0.12, percentage_format)  # 12% expected return
-        goals.write(f'H{i+1}', 'Planning', cell_format)
+    for i, goal in enumerate(sample_goals):
+        row = i + 2
+        goals.write(f'A{row}', 'Mandatory', cell_format)  # Mandatory/Optional
+        goals.write(f'B{row}', i+1, cell_format)  # S.No
+        goals.write(f'C{row}', goal, cell_format)  # Goal Name
+        goals.write(f'D{row}', 10, cell_format)  # Time to Achieve (years)
+        goals.write(f'E{row}', 1000000, currency_format)  # Today's Value
+        goals.write(f'F{row}', 0.06, percentage_format)  # Inflation %
+        # Future Value = Today's Value * (1 + Inflation)^Years
+        goals.write(f'G{row}', f'=E{row}*POWER(1+F{row},D{row})', currency_format)
+        goals.write(f'H{row}', 0, currency_format)  # Offset
+        # Deficit = Future Value - Offset
+        goals.write(f'I{row}', f'=G{row}-H{row}', currency_format)
+        goals.write(f'J{row}', 0.12, percentage_format)  # Expected Rate of Return
+        # Monthly Investment Required = PMT(rate/12, years*12, 0, -deficit)
+        goals.write(f'K{row}', f'=PMT(J{row}/12,D{row}*12,0,-I{row})', currency_format)
+        goals.write(f'L{row}', 0, currency_format)  # Actual Investment being started
 
     # 7. CALCULATIONS SHEET
     calc = workbook.add_worksheet('Calculations')
