@@ -57,48 +57,92 @@ def create_financial_advisor_workbook():
         'border': 1
     })
 
+    # Navigation button format
+    nav_format = workbook.add_format({
+        'bold': True,
+        'font_size': 10,
+        'bg_color': '#70AD47',
+        'font_color': 'white',
+        'align': 'center',
+        'valign': 'vcenter',
+        'border': 2
+    })
+    
     # 1. DASHBOARD SHEET
     dashboard = workbook.add_worksheet('Dashboard')
     dashboard.set_column('A:A', 20)
     dashboard.set_column('B:B', 15)
     dashboard.set_column('C:C', 15)
+    dashboard.set_column('D:D', 15)
+    dashboard.set_column('E:E', 15)
     
     # Dashboard headers
     dashboard.write('A1', 'FINANCIAL DASHBOARD', header_format)
-    dashboard.merge_range('A1:C1', 'FINANCIAL DASHBOARD', header_format)
+    dashboard.merge_range('A1:E1', 'FINANCIAL DASHBOARD', header_format)
+    
+    # Navigation buttons
+    dashboard.write('A2', 'Go to Income', nav_format)
+    dashboard.write('B2', 'Go to Expenses', nav_format) 
+    dashboard.write('C2', 'Go to Assets', nav_format)
+    dashboard.write('D2', 'Go to Liabilities', nav_format)
+    dashboard.write('E2', 'Go to Goals', nav_format)
     
     # Net Worth Summary
-    dashboard.write('A3', 'NET WORTH SUMMARY', header_format)
-    dashboard.write('A4', 'Total Assets', cell_format)
-    dashboard.write('B4', '=Assets!B20', currency_format)
-    dashboard.write('A5', 'Total Liabilities', cell_format)
-    dashboard.write('B5', '=Liabilities!B15', currency_format)
-    dashboard.write('A6', 'Net Worth', total_format)
-    dashboard.write('B6', '=B4-B5', total_format)
+    dashboard.write('A4', 'NET WORTH SUMMARY', header_format)
+    dashboard.merge_range('A4:B4', 'NET WORTH SUMMARY', header_format)
+    dashboard.write('A5', 'Total Assets', cell_format)
+    dashboard.write('B5', '=Assets!B20', currency_format)
+    dashboard.write('C5', '→ View Assets', nav_format)
+    dashboard.write('A6', 'Total Liabilities', cell_format)
+    dashboard.write('B6', '=Liabilities!B15', currency_format)
+    dashboard.write('C6', '→ View Liabilities', nav_format)
+    dashboard.write('A7', 'Net Worth', total_format)
+    dashboard.write('B7', '=B5-B6', total_format)
     
     # Monthly Cash Flow
-    dashboard.write('A8', 'MONTHLY CASH FLOW', header_format)
-    dashboard.write('A9', 'Total Income', cell_format)
-    dashboard.write('B9', '=Income!B15', currency_format)
-    dashboard.write('A10', 'Total Expenses', cell_format)
-    dashboard.write('B10', '=Expenses!B25', currency_format)
-    dashboard.write('A11', 'Monthly Surplus', total_format)
-    dashboard.write('B11', '=B9-B10', total_format)
+    dashboard.write('A9', 'MONTHLY CASH FLOW', header_format)
+    dashboard.merge_range('A9:B9', 'MONTHLY CASH FLOW', header_format)
+    dashboard.write('A10', 'Total Income', cell_format)
+    dashboard.write('B10', '=Income!B15', currency_format)
+    dashboard.write('C10', '→ View Income', nav_format)
+    dashboard.write('A11', 'Total Expenses', cell_format)
+    dashboard.write('B11', '=Expenses!B25', currency_format)
+    dashboard.write('C11', '→ View Expenses', nav_format)
+    dashboard.write('A12', 'Monthly Surplus', total_format)
+    dashboard.write('B12', '=B10-B11', total_format)
     
     # Goal Progress
-    dashboard.write('A13', 'GOAL PROGRESS', header_format)
-    dashboard.write('A14', 'Goals Defined', cell_format)
-    dashboard.write('B14', '=COUNTA(Goals!A3:A12)', cell_format)
-    dashboard.write('A15', 'Total Goal Amount', cell_format)
-    dashboard.write('B15', '=SUM(Goals!D3:D12)', currency_format)
+    dashboard.write('A14', 'GOAL PROGRESS', header_format)
+    dashboard.merge_range('A14:B14', 'GOAL PROGRESS', header_format)
+    dashboard.write('A15', 'Goals Defined', cell_format)
+    dashboard.write('B15', '=COUNTA(Goals!A3:A12)', cell_format)
+    dashboard.write('C15', '→ View Goals', nav_format)
+    dashboard.write('A16', 'Total Goal Amount', cell_format)
+    dashboard.write('B16', '=SUM(Goals!D3:D12)', currency_format)
+    
+    # Quick Ratios
+    dashboard.write('A18', 'FINANCIAL RATIOS', header_format)
+    dashboard.merge_range('A18:B18', 'FINANCIAL RATIOS', header_format)
+    dashboard.write('A19', 'Debt-to-Income Ratio', cell_format)
+    dashboard.write('B19', '=B6/B10', percentage_format)
+    dashboard.write('A20', 'Savings Rate', cell_format)
+    dashboard.write('B20', '=B12/B10', percentage_format)
+    dashboard.write('A21', 'Asset-to-Liability Ratio', cell_format)
+    dashboard.write('B21', '=B5/B6', cell_format)
 
     # 2. INCOME SHEET
     income = workbook.add_worksheet('Income')
     income.set_column('A:A', 25)
     income.set_column('B:B', 15)
+    income.set_column('C:C', 15)
     
     income.write('A1', 'MONTHLY INCOME TRACKER', header_format)
-    income.merge_range('A1:B1', 'MONTHLY INCOME TRACKER', header_format)
+    income.merge_range('A1:C1', 'MONTHLY INCOME TRACKER', header_format)
+    
+    # Navigation back to dashboard
+    income.write('A2', '← Back to Dashboard', nav_format)
+    income.write('B2', 'View Expenses →', nav_format)
+    income.write('C2', 'View Assets →', nav_format)
     
     income_categories = [
         'Salary/Wages', 'Business Income', 'Rental Income', 'Dividend Income',
@@ -106,23 +150,34 @@ def create_financial_advisor_workbook():
         'Social Security', 'Other Income 1', 'Other Income 2', 'Other Income 3'
     ]
     
-    income.write('A2', 'Income Source', header_format)
-    income.write('B2', 'Monthly Amount (₹)', header_format)
+    income.write('A4', 'Income Source', header_format)
+    income.write('B4', 'Monthly Amount (₹)', header_format)
     
-    for i, category in enumerate(income_categories, 3):
+    for i, category in enumerate(income_categories, 5):
         income.write(f'A{i}', category, cell_format)
         income.write(f'B{i}', 0, currency_format)
     
-    income.write('A15', 'TOTAL MONTHLY INCOME', total_format)
-    income.write('B15', f'=SUM(B3:B14)', total_format)
+    income.write('A17', 'TOTAL MONTHLY INCOME', total_format)
+    income.write('B17', f'=SUM(B5:B16)', total_format)
+    
+    # Link to dashboard
+    income.write('A19', 'This total appears in Dashboard B10', cell_format)
+    income.write('A20', 'Monthly Surplus = Income - Expenses', cell_format)
+    income.write('B20', f'=B17-Expenses!B27', currency_format)
 
     # 3. EXPENSES SHEET
     expenses = workbook.add_worksheet('Expenses')
     expenses.set_column('A:A', 25)
     expenses.set_column('B:B', 15)
+    expenses.set_column('C:C', 15)
     
     expenses.write('A1', 'MONTHLY EXPENSE TRACKER', header_format)
-    expenses.merge_range('A1:B1', 'MONTHLY EXPENSE TRACKER', header_format)
+    expenses.merge_range('A1:C1', 'MONTHLY EXPENSE TRACKER', header_format)
+    
+    # Navigation
+    expenses.write('A2', '← Back to Dashboard', nav_format)
+    expenses.write('B2', '← View Income', nav_format)
+    expenses.write('C2', 'View Liabilities →', nav_format)
     
     expense_categories = [
         'Housing (Rent/EMI)', 'Utilities', 'Groceries', 'Transportation',
@@ -133,23 +188,36 @@ def create_financial_advisor_workbook():
         'Maintenance', 'Other Expenses 1', 'Other Expenses 2'
     ]
     
-    expenses.write('A2', 'Expense Category', header_format)
-    expenses.write('B2', 'Monthly Amount (₹)', header_format)
+    expenses.write('A4', 'Expense Category', header_format)
+    expenses.write('B4', 'Monthly Amount (₹)', header_format)
     
-    for i, category in enumerate(expense_categories, 3):
+    for i, category in enumerate(expense_categories, 5):
         expenses.write(f'A{i}', category, cell_format)
         expenses.write(f'B{i}', 0, currency_format)
     
-    expenses.write('A25', 'TOTAL MONTHLY EXPENSES', total_format)
-    expenses.write('B25', f'=SUM(B3:B24)', total_format)
+    expenses.write('A27', 'TOTAL MONTHLY EXPENSES', total_format)
+    expenses.write('B27', f'=SUM(B5:B26)', total_format)
+    
+    # Link to other sheets
+    expenses.write('A29', 'This total appears in Dashboard B11', cell_format)
+    expenses.write('A30', 'Available for Investment', cell_format)
+    expenses.write('B30', f'=Income!B17-B27', currency_format)
+    expenses.write('A31', 'Expense-to-Income Ratio', cell_format)
+    expenses.write('B31', f'=B27/Income!B17', percentage_format)
 
     # 4. ASSETS SHEET
     assets = workbook.add_worksheet('Assets')
     assets.set_column('A:A', 25)
     assets.set_column('B:B', 15)
+    assets.set_column('C:C', 15)
     
     assets.write('A1', 'ASSET PORTFOLIO', header_format)
-    assets.merge_range('A1:B1', 'ASSET PORTFOLIO', header_format)
+    assets.merge_range('A1:C1', 'ASSET PORTFOLIO', header_format)
+    
+    # Navigation
+    assets.write('A2', '← Back to Dashboard', nav_format)
+    assets.write('B2', '← View Income', nav_format)
+    assets.write('C2', 'View Liabilities →', nav_format)
     
     asset_categories = [
         'Cash in Hand', 'Savings Account', 'Current Account', 'Fixed Deposits',
@@ -158,23 +226,36 @@ def create_financial_advisor_workbook():
         'Vehicle', 'Insurance (Cash Value)', 'Business Assets', 'Other Assets 1', 'Other Assets 2'
     ]
     
-    assets.write('A2', 'Asset Type', header_format)
-    assets.write('B2', 'Current Value (₹)', header_format)
+    assets.write('A4', 'Asset Type', header_format)
+    assets.write('B4', 'Current Value (₹)', header_format)
     
-    for i, category in enumerate(asset_categories, 3):
+    for i, category in enumerate(asset_categories, 5):
         assets.write(f'A{i}', category, cell_format)
         assets.write(f'B{i}', 0, currency_format)
     
-    assets.write('A20', 'TOTAL ASSETS', total_format)
-    assets.write('B20', f'=SUM(B3:B19)', total_format)
+    assets.write('A23', 'TOTAL ASSETS', total_format)
+    assets.write('B23', f'=SUM(B5:B22)', total_format)
+    
+    # Link to dashboard and liabilities
+    assets.write('A25', 'This total appears in Dashboard B5', cell_format)
+    assets.write('A26', 'Net Worth = Assets - Liabilities', cell_format)
+    assets.write('B26', f'=B23-Liabilities!B17', currency_format)
+    assets.write('A27', 'Asset Growth Target (10% annually)', cell_format)
+    assets.write('B27', f'=B23*1.1', currency_format)
 
     # 5. LIABILITIES SHEET
     liabilities = workbook.add_worksheet('Liabilities')
     liabilities.set_column('A:A', 25)
     liabilities.set_column('B:B', 15)
+    liabilities.set_column('C:C', 15)
     
     liabilities.write('A1', 'LIABILITY PORTFOLIO', header_format)
-    liabilities.merge_range('A1:B1', 'LIABILITY PORTFOLIO', header_format)
+    liabilities.merge_range('A1:C1', 'LIABILITY PORTFOLIO', header_format)
+    
+    # Navigation
+    liabilities.write('A2', '← Back to Dashboard', nav_format)
+    liabilities.write('B2', '← View Assets', nav_format)
+    liabilities.write('C2', 'View Expenses →', nav_format)
     
     liability_categories = [
         'Home Loan', 'Car Loan', 'Personal Loan', 'Education Loan',
@@ -183,15 +264,24 @@ def create_financial_advisor_workbook():
         'Outstanding Bills', 'Tax Liabilities'
     ]
     
-    liabilities.write('A2', 'Liability Type', header_format)
-    liabilities.write('B2', 'Outstanding Amount (₹)', header_format)
+    liabilities.write('A4', 'Liability Type', header_format)
+    liabilities.write('B4', 'Outstanding Amount (₹)', header_format)
     
-    for i, category in enumerate(liability_categories, 3):
+    for i, category in enumerate(liability_categories, 5):
         liabilities.write(f'A{i}', category, cell_format)
         liabilities.write(f'B{i}', 0, currency_format)
     
-    liabilities.write('A15', 'TOTAL LIABILITIES', total_format)
-    liabilities.write('B15', f'=SUM(B3:B14)', total_format)
+    liabilities.write('A17', 'TOTAL LIABILITIES', total_format)
+    liabilities.write('B17', f'=SUM(B5:B16)', total_format)
+    
+    # Link to other sheets
+    liabilities.write('A19', 'This total appears in Dashboard B6', cell_format)
+    liabilities.write('A20', 'Net Worth = Assets - Liabilities', cell_format)
+    liabilities.write('B20', f'=Assets!B23-B17', currency_format)
+    liabilities.write('A21', 'Debt-to-Asset Ratio', cell_format)
+    liabilities.write('B21', f'=B17/Assets!B23', percentage_format)
+    liabilities.write('A22', 'Monthly Debt Service (Est. 10%)', cell_format)
+    liabilities.write('B22', f'=B17*0.1/12', currency_format)
 
     # 6. GOALS SHEET
     goals = workbook.add_worksheet('Goals')
