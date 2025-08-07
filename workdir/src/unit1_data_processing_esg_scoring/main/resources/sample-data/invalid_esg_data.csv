@@ -1,0 +1,11 @@
+HoldingId,Symbol,CompanyName,Sector,EnvironmentalScore,SocialScore,GovernanceScore,MarketValue
+H011,AMZN,Amazon Inc,Technology,78.5,82.1,85.4,190000000
+H012,,Microsoft Corp,Technology,88.7,85.3,89.4,200000000
+H013,GOOGL,Alphabet Inc,Technology,150.1,79.8,87.6,180000000
+H014,TSLA,Tesla Inc,Automotive,95.2,-10.4,68.9,120000000
+,META,Meta Platforms,Technology,74.2,76.8,82.1,140000000
+H016,NFLX,Netflix Inc,Technology,69.8,78.5,79.2,-50000
+H017,NVDA,NVIDIA Corp,Technology,71.4,75.9,83.7,
+H018,CRM,Salesforce Inc,Technology,85.2,89.1,88.6,0
+H019,ORCL,Oracle Corp,Technology,67.9,74.2,81.5,115000000
+H020,ADBE,Adobe Inc,Technology,76.3,80.7,85.9,125000000

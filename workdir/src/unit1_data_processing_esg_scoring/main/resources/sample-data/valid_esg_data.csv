@@ -1,0 +1,11 @@
+HoldingId,Symbol,CompanyName,Sector,EnvironmentalScore,SocialScore,GovernanceScore,MarketValue
+H001,AAPL,Apple Inc,Technology,85.5,78.2,92.1,150000000
+H002,MSFT,Microsoft Corp,Technology,88.7,85.3,89.4,200000000
+H003,GOOGL,Alphabet Inc,Technology,82.1,79.8,87.6,180000000
+H004,TSLA,Tesla Inc,Automotive,95.2,72.4,68.9,120000000
+H005,JNJ,Johnson & Johnson,Healthcare,76.8,88.5,91.2,160000000
+H006,JPM,JPMorgan Chase,Financial,65.4,82.1,85.7,140000000
+H007,V,Visa Inc,Financial,71.2,86.3,89.8,110000000
+H008,PG,Procter & Gamble,Consumer Goods,79.6,84.7,88.1,130000000
+H009,UNH,UnitedHealth Group,Healthcare,68.9,79.4,86.5,170000000
+H010,HD,Home Depot,Retail,73.5,81.2,84.6,125000000

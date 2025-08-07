@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESG Data Processing Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; }
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .metric { background: #ecf0f1; padding: 15px; border-radius: 5px; text-align: center; }
+        .metric h3 { margin: 0 0 10px 0; color: #34495e; }
+        .metric .value { font-size: 24px; font-weight: bold; color: #27ae60; }
+        .controls { text-align: center; margin: 20px 0; }
+        button { background: #3498db; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 0 10px; }
+        button:hover { background: #2980b9; }
+        .results { margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #34495e; color: white; }
+        .score-high { color: #27ae60; font-weight: bold; }
+        .score-medium { color: #f39c12; font-weight: bold; }
+        .score-low { color: #e74c3c; font-weight: bold; }
+        .status-valid { color: #27ae60; }
+        .status-invalid { color: #e74c3c; }
+        .log { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ESG Data Processing & Scoring Demo</h1>
+        
+        <div class="metrics">
+            <div class="metric">
+                <h3>Total Companies</h3>
+                <div class="value" id="totalCompanies">10</div>
+            </div>
+            <div class="metric">
+                <h3>Valid Records</h3>
+                <div class="value" id="validRecords">0</div>
+            </div>
+            <div class="metric">
+                <h3>Invalid Records</h3>
+                <div class="value" id="invalidRecords">0</div>
+            </div>
+            <div class="metric">
+                <h3>Avg ESG Score</h3>
+                <div class="value" id="avgScore">0.0</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="processData()">Process ESG Data</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+
+        <div class="results">
+            <table id="resultsTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Sector</th>
+                        <th>ESG Score</th>
+                        <th>Status</th>
+                        <th>Issues</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody"></tbody>
+            </table>
+        </div>
+
+        <div class="log" id="logOutput"></div>
+    </div>
+
+    <script>
+        const sampleData = [
+            { company: "Apple Inc.", sector: "Technology", environmental: 85, social: 78, governance: 92 },
+            { company: "Microsoft Corp.", sector: "Technology", environmental: 88, social: 82, governance: 89 },
+            { company: "Amazon.com Inc.", sector: "Consumer Discretionary", environmental: 72, social: 65, governance: 78 },
+            { company: "Tesla Inc.", sector: "Automotive", environmental: 95, social: 71, governance: 68 },
+            { company: "Johnson & Johnson", sector: "Healthcare", environmental: 79, social: 88, governance: 91 },
+            { company: "JPMorgan Chase", sector: "Financial Services", environmental: 68, social: 74, governance: 85 },
+            { company: "Walmart Inc.", sector: "Consumer Staples", environmental: 71, social: 69, governance: 76 },
+            { company: "Procter & Gamble", sector: "Consumer Staples", environmental: 83, social: 86, governance: 88 },
+            { company: "Invalid Corp A", sector: "Technology", environmental: -5, social: 75, governance: 80 },
+            { company: "Invalid Corp B", sector: "Healthcare", environmental: 85, social: 150, governance: 70 }
+        ];
+
+        function log(message) {
+            const logOutput = document.getElementById('logOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            logOutput.innerHTML += `[${timestamp}] ${message}\n`;
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+
+        function validateESGData(data) {
+            const issues = [];
+            if (data.environmental < 0 || data.environmental > 100) issues.push("Environmental score out of range");
+            if (data.social < 0 || data.social > 100) issues.push("Social score out of range");
+            if (data.governance < 0 || data.governance > 100) issues.push("Governance score out of range");
+            return { valid: issues.length === 0, issues };
+        }
+
+        function calculateESGScore(data) {
+            return Math.round((data.environmental * 0.4 + data.social * 0.3 + data.governance * 0.3) * 10) / 10;
+        }
+
+        function getScoreClass(score) {
+            if (score >= 80) return 'score-high';
+            if (score >= 60) return 'score-medium';
+            return 'score-low';
+        }
+
+        function processData() {
+            log("Starting ESG data processing...");
+            
+            const results = [];
+            let validCount = 0;
+            let invalidCount = 0;
+            let totalScore = 0;
+
+            sampleData.forEach((company, index) => {
+                log(`Processing ${company.company}...`);
+                
+                const validation = validateESGData(company);
+                const esgScore = validation.valid ? calculateESGScore(company) : 0;
+                
+                if (validation.valid) {
+                    validCount++;
+                    totalScore += esgScore;
+                } else {
+                    invalidCount++;
+                }
+
+                results.push({
+                    company: company.company,
+                    sector: company.sector,
+                    score: esgScore,
+                    valid: validation.valid,
+                    issues: validation.issues.join(", ") || "None"
+                });
+
+                // Simulate processing delay
+                setTimeout(() => {
+                    if (index === sampleData.length - 1) {
+                        displayResults(results, validCount, invalidCount, totalScore);
+                    }
+                }, (index + 1) * 200);
+            });
+        }
+
+        function displayResults(results, validCount, invalidCount, totalScore) {
+            log("Processing completed. Displaying results...");
+            
+            // Update metrics
+            document.getElementById('validRecords').textContent = validCount;
+            document.getElementById('invalidRecords').textContent = invalidCount;
+            document.getElementById('avgScore').textContent = validCount > 0 ? (totalScore / validCount).toFixed(1) : '0.0';
+
+            // Display table
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+            
+            results.forEach(result => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${result.company}</td>
+                    <td>${result.sector}</td>
+                    <td class="${getScoreClass(result.score)}">${result.score}</td>
+                    <td class="${result.valid ? 'status-valid' : 'status-invalid'}">${result.valid ? 'Valid' : 'Invalid'}</td>
+                    <td>${result.issues}</td>
+                `;
+            });
+
+            document.getElementById('resultsTable').style.display = 'table';
+            log(`Summary: ${validCount} valid, ${invalidCount} invalid records processed.`);
+        }
+
+        function clearResults() {
+            document.getElementById('resultsTable').style.display = 'none';
+            document.getElementById('validRecords').textContent = '0';
+            document.getElementById('invalidRecords').textContent = '0';
+            document.getElementById('avgScore').textContent = '0.0';
+            document.getElementById('logOutput').innerHTML = '';
+            log("Results cleared. Ready for new processing.");
+        }
+
+        // Initialize
+        log("ESG Data Processing Demo initialized. Click 'Process ESG Data' to start.");
+    </script>
+</body>
+</html>
